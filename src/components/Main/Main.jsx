@@ -43,6 +43,20 @@ const Main = () => {
             <img src={assets.code_icon} alt="compass-icon" />
           </div>
         </div>
+        <div className="main-bottom">
+          <div className="search-box">
+            <input type="text" placeholder="Enter a prompt here" />
+            <div>
+              <img src={assets.gallery_icon} alt="gallary-icon" />
+              <img src={assets.mic_icon} alt="mic-icon" />
+              <img src={assets.send_icon} alt="send-icon" />
+            </div>
+          </div>
+          <p className="bottom-info">
+            gemini may display innacurate info,including about people,so
+            double-check its response.by Kimtech
+          </p>
+        </div>
       </div>
     </div>
   );
