@@ -28,8 +28,9 @@ async function run(prompt, retries = 3, delay = 3000) {
   for (let i = 0; i < retries; i++) {
     try {
       const result = await chatSession.sendMessage(prompt);
-      console.log(result.response.text());
-      return result.response.text();
+      const response = result.response;
+      console.log(response.text());
+      return response.text();
     } catch (error) {
       if (error.message.includes("429")) {
         console.warn(`Rate limit hit, retrying in ${delay / 1000} seconds...`);
