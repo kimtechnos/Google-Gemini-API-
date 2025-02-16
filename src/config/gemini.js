@@ -1,86 +1,10 @@
-// import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
-// require("dotenv").config();
-
-// const apiKey = process.env.GEMINI_API_KEY;
-// const genAI = new GoogleGenerativeAI(apiKey);
-
-// const model = genAI.getGenerativeModel({
-//   model: "gemini-1.5-flash",
-// });
-
-// const generationConfig = {
-//   temperature: 1,
-//   topP: 0.95,
-//   topK: 40,
-//   maxOutputTokens: 8192,
-//   responseMimeType: "text/plain",
-// };
-
-// async function run() {
-//   const chatSession = model.startChat({
-//     generationConfig,
-//     history: [],
-//   });
-
-//   const result = await chatSession.sendMessage("INSERT_INPUT_HERE");
-//   console.log(result.response.text());
-// }
-
-// run();
-// import {
-//   GoogleGenerativeAI,
-//   HarmCategory,
-//   HarmBlockThreshold,
-// } from "@google/generative-ai";
-// import "dotenv/config";
-
-// const apiKey = process.env.GEMINI_API_KEY;
-
-// if (!apiKey) {
-//   console.error(
-//     "Error: GEMINI_API_KEY is not set in the environment variables."
-//   );
-//   process.exit(1);
-// }
-
-// const genAI = new GoogleGenerativeAI(apiKey);
-
-// const model = genAI.getGenerativeModel({
-//   model: "gemini-1.5-flash",
-// });
-
-// const generationConfig = {
-//   temperature: 1,
-//   topP: 0.95,
-//   topK: 40,
-//   maxOutputTokens: 8192,
-//   responseMimeType: "text/plain",
-// };
-
-// async function run() {
-//   try {
-//     const chatSession = model.startChat({
-//       generationConfig,
-//       history: [],
-//     });
-
-//     const result = await chatSession.sendMessage("What is the future of AI?");
-//     console.log("AI Response:", result.response.text);
-//   } catch (error) {
-//     console.error("Error during AI interaction:", error);
-//   }
-// }
-
-// run();
-
-const {
+import {
   GoogleGenerativeAI,
   HarmCategory,
   HarmBlockThreshold,
-} = require("@google/generative-ai");
+} from "@google/generative-ai";
 
-// const apiKey = process.env.GEMINI_API_KEY;
-const apiKey = "AIzaSyAXx9q4U3exIoEnHs4Q9IUggHSdbulDZuQ";
+const apiKey = "AIzaSyBJaw44XDNjHXFoB50aNzEwP8Ntw9mIpLM";
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
@@ -95,14 +19,29 @@ const generationConfig = {
   responseMimeType: "text/plain",
 };
 
-async function run(prompt) {
+async function run(prompt, retries = 3, delay = 3000) {
   const chatSession = model.startChat({
     generationConfig,
     history: [],
   });
 
-  const result = await chatSession.sendMessage(prompt);
-  console.log(result.response.text());
+  for (let i = 0; i < retries; i++) {
+    try {
+      const result = await chatSession.sendMessage(prompt);
+      console.log(result.response.text());
+      return result.response.text();
+    } catch (error) {
+      if (error.message.includes("429")) {
+        console.warn(`Rate limit hit, retrying in ${delay / 1000} seconds...`);
+        await new Promise((res) => setTimeout(res, delay));
+      } else {
+        console.error("Error:", error);
+        throw error;
+      }
+    }
+  }
+
+  throw new Error("Max retries reached.");
 }
 
-export default run; 
+export default run;
